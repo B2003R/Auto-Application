@@ -1,0 +1,122 @@
+% Minimal LaTeX Resume Template for Job Application Co-Pilot
+% This template is designed to work with the automated tailoring system
+
+\documentclass[11pt,letterpaper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{fontawesome5}
+
+% Colors
+\definecolor{headercolor}{RGB}{0, 51, 102}
+\definecolor{linkcolor}{RGB}{0, 102, 204}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor
+}
+
+% Section formatting
+\titleformat{\section}
+    {\large\bfseries\color{headercolor}}
+    {}
+    {0em}
+    {}
+    [\titlerule]
+
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+% List formatting
+\setlist[itemize]{noitemsep, topsep=2pt, leftmargin=*}
+
+% Remove page numbers
+\pagestyle{empty}
+
+% Custom commands
+\newcommand{\role}[4]{
+    \textbf{#1} \hfill #2 \\
+    \textit{#3} \hfill \textit{#4}
+}
+
+\newcommand{\project}[2]{
+    \textbf{#1} -- #2
+}
+
+\begin{document}
+
+% =============================================================================
+% HEADER
+% =============================================================================
+\begin{center}
+    {\LARGE\textbf{FIRST LAST}} \\[4pt]
+    \faIcon{map-marker-alt} City, State \quad
+    \faIcon{envelope} \href{mailto:email@example.com}{email@example.com} \quad
+    \faIcon{phone} (555) 123-4567 \\[2pt]
+    \faIcon{linkedin} \href{https://linkedin.com/in/username}{linkedin.com/in/username} \quad
+    \faIcon{github} \href{https://github.com/username}{github.com/username}
+\end{center}
+
+% =============================================================================
+% PROFESSIONAL SUMMARY
+% =============================================================================
+\section{Professional Summary}
+Senior Software Engineer with X+ years of experience in [relevant skills].
+Expertise in [key technologies]. Proven track record of [key achievements].
+
+% =============================================================================
+% TECHNICAL SKILLS
+% =============================================================================
+\section{Technical Skills}
+\begin{itemize}
+    \item \textbf{Languages:} Python, JavaScript, Go, SQL
+    \item \textbf{Frameworks:} FastAPI, Django, React, Node.js
+    \item \textbf{Cloud/DevOps:} AWS, GCP, Docker, Kubernetes
+    \item \textbf{Databases:} PostgreSQL, MongoDB, Redis
+\end{itemize}
+
+% =============================================================================
+% PROFESSIONAL EXPERIENCE
+% =============================================================================
+\section{Professional Experience}
+
+\role{Senior Software Engineer}{2021 -- Present}{Company Name}{City, State}
+\begin{itemize}
+    \item Achieved [quantified result] by [action taken]
+    \item Designed and implemented [system/feature] resulting in [impact]
+    \item Led [initiative] improving [metric] by [percentage]
+\end{itemize}
+
+\vspace{6pt}
+
+\role{Software Engineer}{2019 -- 2021}{Company Name}{City, State}
+\begin{itemize}
+    \item Built [feature/system] that [impact]
+    \item Optimized [process] resulting in [quantified improvement]
+    \item Collaborated with [teams] to deliver [outcome]
+\end{itemize}
+
+% =============================================================================
+% EDUCATION
+% =============================================================================
+\section{Education}
+\textbf{Bachelor of Science in Computer Science} \hfill 2018 \\
+University Name \hfill GPA: 3.X/4.0
+
+% =============================================================================
+% CERTIFICATIONS (Optional)
+% =============================================================================
+\section{Certifications \& Achievements}
+\begin{itemize}
+    \item AWS Solutions Architect Associate (Year)
+    \item Certification or Achievement
+\end{itemize}
+
+\end{document}

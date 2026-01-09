@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Project specific
+job_history.db
+*.log
+temp/
+data/generated/*.pdf
+
+# LaTeX auxiliary files
+*.aux
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
