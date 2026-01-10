@@ -10,6 +10,13 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# PDF support via PyMuPDF
+try:
+    import fitz  # PyMuPDF
+    PDF_SUPPORT = True
+except ImportError:
+    PDF_SUPPORT = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -45,17 +52,28 @@ class VectorMatcher:
     
     def load_resume(self, resume_path: Path) -> bool:
         """
-        Load and vectorize the user's resume.
+        Load and vectorize the user's resume from PDF.
         This is done once at startup and cached.
         
         Args:
-            resume_path: Path to the resume text file.
+            resume_path: Path to the resume PDF file.
             
         Returns:
             True if resume was loaded successfully.
         """
         try:
-            self._resume_text = resume_path.read_text(encoding='utf-8')
+            file_ext = resume_path.suffix.lower()
+            
+            if file_ext != '.pdf':
+                logger.error(f"Resume must be in PDF format. Got: {file_ext}")
+                return False
+            
+            self._resume_text = self._extract_text_from_pdf(resume_path)
+            
+            if not self._resume_text or not self._resume_text.strip():
+                logger.error(f"Resume PDF is empty or could not be parsed: {resume_path}")
+                return False
+            
             self._resume_vector = self.model.encode(
                 self._resume_text, 
                 convert_to_numpy=True,
@@ -71,6 +89,35 @@ class VectorMatcher:
         except Exception as e:
             logger.error(f"Failed to load resume: {e}")
             return False
+    
+    def _extract_text_from_pdf(self, pdf_path: Path) -> str:
+        """
+        Extract text content from a PDF file.
+        
+        Args:
+            pdf_path: Path to the PDF file.
+            
+        Returns:
+            Extracted text content.
+        """
+        if not PDF_SUPPORT:
+            raise ImportError(
+                "PDF support requires PyMuPDF. Install with: pip install pymupdf"
+            )
+        
+        text_parts = []
+        doc = fitz.open(pdf_path)
+        num_pages = len(doc)
+        for page_num, page in enumerate(doc):
+            page_text = page.get_text()
+            if page_text:
+                text_parts.append(page_text)
+                logger.debug(f"Extracted {len(page_text)} chars from page {page_num + 1}")
+        doc.close()
+        
+        full_text = "\n".join(text_parts)
+        logger.info(f"Extracted {len(full_text)} chars from {num_pages} PDF pages")
+        return full_text
     
     def load_resume_from_text(self, resume_text: str) -> bool:
         """

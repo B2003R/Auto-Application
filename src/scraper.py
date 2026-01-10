@@ -31,86 +31,36 @@ class Job:
     @classmethod
     def from_bright_data(cls, data: Dict[str, Any]) -> "Job":
         """
-        Create Job instance from Bright Data API response.
+        Create Job instance from Bright Data LinkedIn Jobs API response.
         
-        Bright Data job schema varies by source, this handles common fields.
+        LinkedIn API field names:
+        - job_posting_id: unique job identifier
+        - job_title: position title
+        - company_name: employer name
+        - job_summary: job description text
+        - job_location: city/state
+        - apply_link: application URL
+        - url: LinkedIn job page URL
+        - job_base_pay_range: salary info
+        - job_posted_date: ISO timestamp
+        - job_employment_type: Full-time, Part-time, etc.
         """
-        # Try multiple possible field names for each attribute
-        job_id = (
-            data.get("job_id") or 
-            data.get("id") or 
-            data.get("jobId") or
-            data.get("url", "").split("/")[-1] or
-            str(hash(json.dumps(data, sort_keys=True)))
-        )
+        # Extract job ID from URL if job_posting_id not present
+        job_id = data.get("job_posting_id") or data.get("url", "").split("/")[-1].split("?")[0]
         
-        company = (
-            data.get("company") or 
-            data.get("company_name") or 
-            data.get("companyName") or 
-            data.get("employer") or
-            "Unknown Company"
-        )
-        
-        title = (
-            data.get("title") or 
-            data.get("job_title") or 
-            data.get("jobTitle") or 
-            data.get("position") or
-            "Unknown Position"
-        )
-        
-        description = (
-            data.get("description") or 
-            data.get("job_description") or 
-            data.get("jobDescription") or 
-            data.get("details") or
-            ""
-        )
-        
-        location = (
-            data.get("location") or 
-            data.get("job_location") or 
-            data.get("city")
-        )
-        
-        apply_link = (
-            data.get("apply_link") or 
-            data.get("apply_url") or 
-            data.get("applyUrl") or 
-            data.get("url") or
-            data.get("job_url")
-        )
-        
-        salary = (
-            data.get("salary") or 
-            data.get("salary_range") or 
-            data.get("compensation")
-        )
-        
-        posted_date = (
-            data.get("posted_date") or 
-            data.get("date_posted") or 
-            data.get("postedAt") or
-            data.get("posted_at")
-        )
-        
-        job_type = (
-            data.get("job_type") or 
-            data.get("employment_type") or 
-            data.get("type")
-        )
+        # Use apply_link if available, otherwise use LinkedIn job URL
+        apply_link = data.get("apply_link") or data.get("url")
         
         return cls(
             job_id=str(job_id),
-            company=company,
-            title=title,
-            description=description,
-            location=location,
+            company=data.get("company_name", "Unknown Company"),
+            title=data.get("job_title", "Unknown Position"),
+            description=data.get("job_summary", ""),
+            location=data.get("job_location"),
             apply_link=apply_link,
-            salary=salary,
-            posted_date=posted_date,
-            job_type=job_type,
+            salary=data.get("job_base_pay_range"),
+            posted_date=data.get("job_posted_date"),
+            job_type=data.get("job_employment_type"),
             raw_data=data
         )
 
@@ -131,12 +81,12 @@ class BrightDataJobScraper:
     BASE_URL = "https://api.brightdata.com/datasets/v3/scrape"
     
     # Mapping from our time_range values to Bright Data's expected values
+    # Valid LinkedIn time ranges: Past 24 hours, Past week, Past month
     TIME_RANGE_MAP = {
-        "past_2hrs": "Past 2 hours",
         "past_24h": "Past 24 hours",
         "past_week": "Past week",
         "past_month": "Past month",
-        "any": ""
+        "any": ""  # No filter
     }
     
     # Valid job types for LinkedIn
@@ -201,7 +151,7 @@ class BrightDataJobScraper:
         self,
         companies: List[str],
         keywords: List[str],
-        time_range: str = "past_2hrs",
+        time_range: str = "past_24h",
         location: Optional[str] = None,
         country: Optional[str] = None,
         job_type: Optional[str] = None,
@@ -214,7 +164,7 @@ class BrightDataJobScraper:
         Args:
             companies: List of company names to search.
             keywords: Search keywords.
-            time_range: Time filter (past_2hrs, past_24h, past_week, past_month).
+            time_range: Time filter (past_24h, past_week, past_month).
             location: Location string (e.g., "New York", "San Francisco").
             country: Country code (e.g., "US", "FR").
             job_type: Job type filter.
@@ -231,46 +181,32 @@ class BrightDataJobScraper:
         
         # Convert other filters if provided
         bd_job_type = self.JOB_TYPE_MAP.get(job_type, "") if job_type else ""
-        bd_experience = self.EXPERIENCE_MAP.get(experience_level, "") if experience_level else ""
         bd_remote = self.REMOTE_MAP.get(remote, "") if remote else ""
         
-        # Use defaults if not provided
-        loc = location or self.default_location
-        ctry = country or self.default_country
+        # Fixed location for United States
+        loc = "United States of America"
+        ctry = "US"
         
-        # Build queries combining companies and keywords
+        # Experience levels to search: Entry level and Internship
+        experience_levels = ["Entry level", "Internship"]
+        
+        # Build queries: company in company field, keyword in keyword field
+        # Create queries for each combination of company, keyword, and experience level
         for company in companies:
             for keyword in keywords:
-                # Create search keyword - can include company name
-                search_keyword = f"{keyword} {company}".strip()
-                
-                query = {
-                    "location": loc,
-                    "keyword": search_keyword,
-                    "country": ctry,
-                    "time_range": bd_time_range,
-                    "job_type": bd_job_type,
-                    "experience_level": bd_experience,
-                    "remote": bd_remote,
-                    "company": "",  # Can be used for exact company filtering
-                    "location_radius": ""  # Optional radius
-                }
-                queries.append(query)
-        
-        # Also add keyword-only searches (without company in keyword)
-        for keyword in keywords:
-            query = {
-                "location": loc,
-                "keyword": keyword,
-                "country": ctry,
-                "time_range": bd_time_range,
-                "job_type": bd_job_type,
-                "experience_level": bd_experience,
-                "remote": bd_remote,
-                "company": "",
-                "location_radius": ""
-            }
-            queries.append(query)
+                for exp_level in experience_levels:
+                    query = {
+                        "location": loc,
+                        "keyword": keyword,
+                        "country": ctry,
+                        "time_range": bd_time_range,
+                        "job_type": bd_job_type,
+                        "experience_level": exp_level,
+                        "remote": bd_remote,
+                        "company": company,  # Company name in company filter
+                        "location_radius": ""
+                    }
+                    queries.append(query)
         
         return queries
     
@@ -278,7 +214,7 @@ class BrightDataJobScraper:
         self,
         companies: List[str],
         keywords: List[str],
-        time_range: str = "past_2hrs",
+        time_range: str = "past_24h",
         location: Optional[str] = None,
         country: Optional[str] = None,
         job_type: Optional[str] = None,
@@ -331,16 +267,46 @@ class BrightDataJobScraper:
             
             logger.info(f"Response status: {response.status_code}")
             
-            # 200 = immediate response, 202 = accepted for async processing
+            # 200 = immediate response with data, 202 = accepted for async processing
             if response.status_code in (200, 202):
-                result = response.json()
-                snapshot_id = result.get("snapshot_id")
-                logger.info(f"Collection triggered successfully. Snapshot ID: {snapshot_id}")
-                return snapshot_id
+                # Handle both JSON and NDJSON responses
+                content = response.text
+                
+                # Parse response - could be single JSON or NDJSON
+                results = []
+                try:
+                    # Try parsing as single JSON object
+                    parsed = json.loads(content)
+                    if isinstance(parsed, list):
+                        results = parsed
+                    else:
+                        results = [parsed]
+                except json.JSONDecodeError:
+                    # Parse as NDJSON (newline-delimited JSON)
+                    for line in content.strip().split('\n'):
+                        if line.strip():
+                            try:
+                                results.append(json.loads(line))
+                            except json.JSONDecodeError:
+                                continue
+                
+                # Check if we got a snapshot_id (async) or immediate data
+                if results and "snapshot_id" in results[0]:
+                    snapshot_id = results[0].get("snapshot_id")
+                    logger.info(f"Collection triggered (async). Snapshot ID: {snapshot_id}")
+                    return {"type": "async", "snapshot_id": snapshot_id}
+                else:
+                    # Immediate data returned - these are the job results
+                    logger.info(f"Collection completed (sync). Got {len(results)} records immediately.")
+                    return {"type": "sync", "data": results}
             else:
                 logger.error(f"API error {response.status_code}: {response.text}")
                 return None
             
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse response: {e}")
+            logger.error(f"Response content: {response.text[:500]}")
+            return None
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to trigger collection: {e}")
             return None
@@ -456,7 +422,7 @@ class BrightDataJobScraper:
         logger.info(f"Starting job scrape for {len(companies)} companies with {len(keywords)} keywords")
         
         # Step 1: Trigger collection
-        snapshot_id = self._trigger_collection(
+        result = self._trigger_collection(
             companies=companies,
             keywords=keywords,
             time_range=time_range,
@@ -467,43 +433,67 @@ class BrightDataJobScraper:
             remote=remote
         )
         
-        if not snapshot_id:
+        if not result:
             logger.error("Failed to trigger collection")
             return []
         
-        # Step 2: Poll for completion
-        logger.info(f"Waiting for collection to complete (polling every {poll_interval}s, max {max_wait}s)...")
-        elapsed = 0
-        while elapsed < max_wait:
-            status = self._check_status(snapshot_id)
-            current_status = status.get("status", "unknown")
-            
-            if current_status == "ready":
-                records = status.get("records", 0)
-                logger.info(f"Collection completed successfully! Records: {records}")
-                break
-            elif current_status in ("failed", "error"):
-                logger.error(f"Collection failed: {status.get('error', status.get('errors', 'Unknown error'))}")
-                return []
-            elif current_status in ("running", "unknown"):
-                progress = status.get("progress", 0)
-                records = status.get("records", 0)
-                logger.info(f"Collection in progress... Progress: {progress}% | Records so far: {records} | Elapsed: {elapsed}s")
-            
-            time.sleep(poll_interval)
-            elapsed += poll_interval
+        # Check if we got immediate data or need to poll
+        if result.get("type") == "sync":
+            # Data returned immediately
+            raw_jobs = result.get("data", [])
+            logger.info(f"Processing {len(raw_jobs)} immediately returned records")
         else:
-            logger.error(f"Collection timed out after {max_wait} seconds")
-            logger.info(f"You can manually check snapshot: {snapshot_id}")
-            return []
-        
-        # Step 3: Download and parse results
-        raw_jobs = self._download_results(snapshot_id)
+            # Async - need to poll for completion
+            snapshot_id = result.get("snapshot_id")
+            if not snapshot_id:
+                logger.error("No snapshot_id received for async collection")
+                return []
+            
+            # Step 2: Poll for completion
+            logger.info(f"Waiting for collection to complete (polling every {poll_interval}s, max {max_wait}s)...")
+            elapsed = 0
+            while elapsed < max_wait:
+                status = self._check_status(snapshot_id)
+                current_status = status.get("status", "unknown")
+                
+                if current_status == "ready":
+                    records = status.get("records", 0)
+                    logger.info(f"Collection completed successfully! Records: {records}")
+                    break
+                elif current_status in ("failed", "error"):
+                    logger.error(f"Collection failed: {status.get('error', status.get('errors', 'Unknown error'))}")
+                    return []
+                elif current_status in ("running", "unknown"):
+                    progress = status.get("progress", 0)
+                    records = status.get("records", 0)
+                    logger.info(f"Collection in progress... Progress: {progress}% | Records so far: {records} | Elapsed: {elapsed}s")
+                
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+            else:
+                logger.error(f"Collection timed out after {max_wait} seconds")
+                logger.info(f"You can manually check snapshot: {snapshot_id}")
+                return []
+            
+            # Step 3: Download results
+            raw_jobs = self._download_results(snapshot_id)
         logger.info(f"Downloaded {len(raw_jobs)} raw job records")
         
-        # Step 4: Convert to Job objects
-        jobs = []
+        # Step 4: Deduplicate by job_posting_id (API may return same job from multiple queries)
+        seen_ids = set()
+        unique_raw_jobs = []
         for raw_job in raw_jobs:
+            job_id = raw_job.get("job_posting_id") or raw_job.get("url", "").split("/")[-1].split("?")[0]
+            if job_id and job_id not in seen_ids:
+                seen_ids.add(job_id)
+                unique_raw_jobs.append(raw_job)
+        
+        if len(unique_raw_jobs) < len(raw_jobs):
+            logger.info(f"Deduplicated: {len(raw_jobs)} -> {len(unique_raw_jobs)} unique jobs")
+        
+        # Step 5: Convert to Job objects
+        jobs = []
+        for raw_job in unique_raw_jobs:
             try:
                 job = Job.from_bright_data(raw_job)
                 if job.description:  # Only include jobs with descriptions

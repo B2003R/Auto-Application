@@ -155,10 +155,10 @@ class JobApplicationCoPilot:
                 logger.error(f"Config error: {error}")
             return False
         
-        # Load resume
-        resume_path = self.config.DATA_DIR / "resume.txt"
+        # Load resume PDF
+        resume_path = self.config.DATA_DIR / "Resume.pdf"
         if not self.matcher.load_resume(resume_path):
-            logger.error("Failed to load resume")
+            logger.error("Failed to load resume PDF")
             return False
         
         # Preload embedding model
@@ -275,7 +275,7 @@ class JobApplicationCoPilot:
         for job in jobs:
             # Step 1: Deduplication Check (Tombstone)
             if self.db.is_duplicate(job.job_id, job.description):
-                logger.debug(f"SKIP (duplicate): {job.job_id}")
+                logger.info(f"SKIP (already processed): {job.company} - {job.title}")
                 self.stats.jobs_skipped_duplicate += 1
                 continue
             

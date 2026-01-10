@@ -33,13 +33,13 @@ class Config:
     
     # Vector Matching
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
-    SIMILARITY_THRESHOLD: float = 0.75
+    SIMILARITY_THRESHOLD: float = 0.50
     
     # Scraping
     SEARCH_KEYWORDS: List[str] = field(
-        default_factory=lambda: ["Software", "Data", "Engineer", "Developer"]
+        default_factory=lambda: ["Developer", "Analyst", "Engineer"]
     )
-    TIME_RANGE: str = "past_2hrs"
+    TIME_RANGE: str = "past_24h"
     DEFAULT_LOCATION: str = field(default_factory=lambda: os.getenv("DEFAULT_LOCATION", "United States"))
     DEFAULT_COUNTRY: str = field(default_factory=lambda: os.getenv("DEFAULT_COUNTRY", "US"))
     
@@ -71,9 +71,10 @@ class Config:
         if not companies_file.exists():
             errors.append(f"Companies file not found: {companies_file}")
         
-        resume_file = self.DATA_DIR / "resume.txt"
-        if not resume_file.exists():
-            errors.append(f"Resume file not found: {resume_file}")
+        # Check for resume PDF file
+        resume_pdf = self.DATA_DIR / "Resume.pdf"
+        if not resume_pdf.exists():
+            errors.append(f"Resume PDF not found: {resume_pdf}")
         
         return errors
 

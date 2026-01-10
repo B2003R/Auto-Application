@@ -27,7 +27,7 @@ Auto-Application/
     main.py              # Main orchestrator & CLI
  data/
     companies.json       # Target company list
-    resume.txt           # Your resume (plain text)
+    resume.pdf           # Your resume (PDF format preferred)
     generated/           # Output PDFs
  templates/
     resume_template.tex  # LaTeX template
@@ -65,7 +65,7 @@ cp .env.example .env
 ### 4. Setup Your Data
 
 1. Edit data/companies.json - Add your target companies
-2. Edit data/resume.txt - Paste your resume in plain text format
+2. Place your resume.pdf in the data/ folder (PDF format required)
 
 ### 5. Run the Pipeline
 
