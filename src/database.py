@@ -33,7 +33,7 @@ class JobRecord:
     content_hash: str
     status: JobStatus
     similarity_score: Optional[float] = None
-    local_path: Optional[str] = None
+    resume_path: Optional[str] = None
     apply_link: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -51,7 +51,7 @@ class DatabaseManager:
         content_hash TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'PENDING',
         similarity_score REAL,
-        local_path TEXT,
+        resume_path TEXT,
         apply_link TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -157,7 +157,7 @@ class DatabaseManager:
         job_description: str,
         status: JobStatus,
         similarity_score: Optional[float] = None,
-        local_path: Optional[str] = None,
+        resume_path: Optional[str] = None,
         apply_link: Optional[str] = None
     ) -> bool:
         """Insert a new job record."""
@@ -168,11 +168,11 @@ class DatabaseManager:
             conn.execute(
                 """
                 INSERT INTO jobs 
-                (job_id, company, title, content_hash, status, similarity_score, local_path, apply_link)
+                (job_id, company, title, content_hash, status, similarity_score, resume_path, apply_link)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (job_id, company, title, content_hash, status.value, 
-                 similarity_score, local_path, apply_link)
+                 similarity_score, resume_path, apply_link)
             )
             conn.commit()
             logger.info(f"Inserted job: {job_id} ({company} - {title}) with status {status.value}")
@@ -186,7 +186,7 @@ class DatabaseManager:
         job_id: str,
         status: JobStatus,
         similarity_score: Optional[float] = None,
-        local_path: Optional[str] = None,
+        resume_path: Optional[str] = None,
         apply_link: Optional[str] = None
     ):
         """Update job status and optional fields."""
@@ -199,9 +199,9 @@ class DatabaseManager:
             updates.append("similarity_score = ?")
             params.append(similarity_score)
         
-        if local_path is not None:
-            updates.append("local_path = ?")
-            params.append(local_path)
+        if resume_path is not None:
+            updates.append("resume_path = ?")
+            params.append(resume_path)
         
         if apply_link is not None:
             updates.append("apply_link = ?")
@@ -230,7 +230,7 @@ class DatabaseManager:
         conn = self._get_connection()
         cursor = conn.execute(
             """
-            SELECT job_id, company, title, similarity_score, local_path, apply_link, created_at
+            SELECT job_id, company, title, similarity_score, resume_path, apply_link, created_at
             FROM jobs 
             WHERE status = ?
             ORDER BY similarity_score DESC

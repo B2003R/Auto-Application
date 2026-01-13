@@ -60,26 +60,26 @@ class PipelineStats:
             duration = f" (Duration: {delta.total_seconds():.1f}s)"
         
         return f"""
-╔══════════════════════════════════════════════════════════════╗
-║              JOB APPLICATION CO-PILOT - RUN SUMMARY          ║
-╠══════════════════════════════════════════════════════════════╣
-║  Run ID: {self.run_id:<52} ║
-║  Started: {self.started_at.strftime('%Y-%m-%d %H:%M:%S'):<51} ║
-╠══════════════════════════════════════════════════════════════╣
-║  PHASE 1 - DISCOVERY                                         ║
-║    Jobs Discovered:     {self.jobs_discovered:>5}                               ║
-╠══════════════════════════════════════════════════════════════╣
-║  PHASE 2 - INTELLIGENCE                                      ║
-║    Skipped (Duplicate): {self.jobs_skipped_duplicate:>5}                               ║
-║    Rejected (Score):    {self.jobs_rejected_score:>5}                               ║
-╠══════════════════════════════════════════════════════════════╣
-║  PHASE 3 - FACTORY                                           ║
-║    Processed:           {self.jobs_processed:>5}                               ║
-║    Ready for Apply:     {self.jobs_ready:>5}                               ║
-║    Failed:              {self.jobs_failed:>5}                               ║
-╠══════════════════════════════════════════════════════════════╣
-║  Est. API Cost: ${self.total_api_cost_estimate:<8.4f}                              ║
-╚══════════════════════════════════════════════════════════════╝{duration}
++==============================================================+
+|              JOB APPLICATION CO-PILOT - RUN SUMMARY          |
++==============================================================+
+|  Run ID: {self.run_id:<52} |
+|  Started: {self.started_at.strftime('%Y-%m-%d %H:%M:%S'):<51} |
++==============================================================+
+|  PHASE 1 - DISCOVERY                                         |
+|    Jobs Discovered:     {self.jobs_discovered:>5}                               |
++==============================================================+
+|  PHASE 2 - INTELLIGENCE                                      |
+|    Skipped (Duplicate): {self.jobs_skipped_duplicate:>5}                               |
+|    Rejected (Score):    {self.jobs_rejected_score:>5}                               |
++==============================================================+
+|  PHASE 3 - FACTORY                                           |
+|    Processed:           {self.jobs_processed:>5}                               |
+|    Ready for Apply:     {self.jobs_ready:>5}                               |
+|    Failed:              {self.jobs_failed:>5}                               |
++==============================================================+
+|  Est. API Cost: ${self.total_api_cost_estimate:<8.4f}                              |
++==============================================================+{duration}
 """
 
 
@@ -411,7 +411,7 @@ class JobApplicationCoPilot:
                     job_description=job.description,
                     status=JobStatus.READY,
                     similarity_score=score,
-                    local_path=compile_result["pdf_path"],
+                    resume_path=compile_result["pdf_path"],
                     apply_link=job.apply_link
                 )
                 
@@ -558,13 +558,13 @@ def main():
         if args.ready:
             # List ready jobs
             ready = copilot.get_ready_jobs()
-            print(f"\n📋 JOBS READY FOR APPLICATION ({len(ready)} total)")
+            print(f"\n[JOBS READY FOR APPLICATION] ({len(ready)} total)")
             print("-" * 60)
             for job in ready:
-                print(f"\n  🏢 {job['company']} - {job['title']}")
+                print(f"\n  {job['company']} - {job['title']}")
                 print(f"     Score: {job['similarity_score']:.2%}")
-                print(f"     PDF: {job['local_path']}")
-                print(f"     Apply: {job['apply_link']}")
+                print(f"     Resume PDF: {job['resume_path']}")
+                print(f"     Apply Link: {job['apply_link']}")
             return
         
         # Run the pipeline

@@ -37,9 +37,42 @@ class Config:
     
     # Scraping
     SEARCH_KEYWORDS: List[str] = field(
-        default_factory=lambda: ["Developer", "Analyst", "Engineer"]
+        default_factory=lambda: [
+            "Junior Data Engineer",
+            "Business Intelligence Analyst",
+            "Data Analyst",
+            "ML Engineer (Entry-Level)",
+            "Analytics Engineer",
+            "ETL Developer",
+            "Financial Data Analyst",
+            "Data Quality Engineer",
+            "Data Scientist",
+            "Cloud Data Engineer (Azure/AWS)",
+            "Software Engineering",
+            "Database Developer",
+            "ML Ops Engineer",
+            "Python Developer (Data-focused)",
+            "Healthcare Data Analyst",
+            "Business Analyst",
+            "Reporting Analyst",
+            "Market Intelligence Analyst",
+            "AI Data Engineer",
+            "Prompt Engineer",
+            "Data Operations Analyst",
+            "Research Assistant",
+            "Analytics Consultant",
+            "Data Integration Engineer",
+            "Risk Analytics Analyst",
+            "Product Analytics Analyst",
+            "Supply Chain Analyst",
+            "Marketing Analytics Analyst",
+            "Fraud Analytics Analyst",
+            "Data Governance Analyst",
+            "Pricing Analyst",
+            "Customer Analytics Analyst"
+            ]
     )
-    TIME_RANGE: str = "past_24h"
+    TIME_RANGE: str = "past_24h"  # Options: past_24h, past_week, past_month, past_year
     DEFAULT_LOCATION: str = field(default_factory=lambda: os.getenv("DEFAULT_LOCATION", "United States"))
     DEFAULT_COUNTRY: str = field(default_factory=lambda: os.getenv("DEFAULT_COUNTRY", "US"))
     
