@@ -27,26 +27,28 @@ class VectorMatcher:
     and immediately discarded after comparison.
     """
     
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", device: str = "cuda:0"):
         """
         Initialize the vector matcher with specified model.
         
         Args:
             model_name: Name of the sentence-transformer model to use.
+            device: Device to load the model on (default: "cuda:0" for NVIDIA GPU).
         """
         self.model_name = model_name
+        self.device = device
         self._model: Optional[SentenceTransformer] = None
         self._resume_vector: Optional[np.ndarray] = None
         self._resume_text: Optional[str] = None
         
-        logger.info(f"VectorMatcher initialized with model: {model_name}")
+        logger.info(f"VectorMatcher initialized with model: {model_name} on device: {device}")
     
     @property
     def model(self) -> SentenceTransformer:
-        """Lazy load the embedding model."""
+        """Lazy load the embedding model on specified device."""
         if self._model is None:
-            logger.info(f"Loading embedding model: {self.model_name}...")
-            self._model = SentenceTransformer(self.model_name)
+            logger.info(f"Loading embedding model: {self.model_name} on device: {self.device}...")
+            self._model = SentenceTransformer(self.model_name, device=self.device)
             logger.info("Embedding model loaded successfully")
         return self._model
     
@@ -265,7 +267,8 @@ class ResumeJobMatcher:
     def __init__(
         self,
         model_name: str = "all-MiniLM-L6-v2",
-        similarity_threshold: float = 0.75
+        similarity_threshold: float = 0.75,
+        device: str = "cuda:0"
     ):
         """
         Initialize the matcher.
@@ -273,8 +276,9 @@ class ResumeJobMatcher:
         Args:
             model_name: Sentence transformer model name.
             similarity_threshold: Minimum score to accept a job.
+            device: Device to load the model on (default: "cuda:0" for NVIDIA GPU).
         """
-        self.matcher = VectorMatcher(model_name)
+        self.matcher = VectorMatcher(model_name, device=device)
         self.threshold = similarity_threshold
     
     def initialize(self, resume_path: Path) -> bool:

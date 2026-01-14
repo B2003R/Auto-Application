@@ -72,7 +72,7 @@ class Config:
             "Customer Analytics Analyst"
             ]
     )
-    TIME_RANGE: str = "past_24h"  # Options: past_24h, past_week, past_month, past_year
+    TIME_RANGE: str = "past_week"  # Options: past_24h, past_week, past_month, past_year
     DEFAULT_LOCATION: str = field(default_factory=lambda: os.getenv("DEFAULT_LOCATION", "United States"))
     DEFAULT_COUNTRY: str = field(default_factory=lambda: os.getenv("DEFAULT_COUNTRY", "US"))
     

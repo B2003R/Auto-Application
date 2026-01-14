@@ -154,7 +154,7 @@ class BrightDataJobScraper:
         time_range: str = "past_24h",
         location: Optional[str] = None,
         country: Optional[str] = None,
-        job_type: Optional[str] = None,
+        job_type: Optional[str] = "full_time",
         experience_level: Optional[str] = None,
         remote: Optional[str] = None
     ) -> List[Dict[str, str]]:
@@ -204,7 +204,8 @@ class BrightDataJobScraper:
                         "experience_level": exp_level,
                         "remote": bd_remote,
                         "company": company,  # Company name in company filter
-                        "location_radius": ""
+                        "location_radius": "",
+                        "selective_search": True
                     }
                     queries.append(query)
         
@@ -399,7 +400,7 @@ class BrightDataJobScraper:
         experience_level: Optional[str] = None,
         remote: Optional[str] = None,
         poll_interval: int = 30,
-        max_wait: int = 600
+        max_wait: int = 1200
     ) -> List[Job]:
         """
         Execute the full scraping workflow.
