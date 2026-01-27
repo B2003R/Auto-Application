@@ -418,7 +418,7 @@ class JobApplicationCoPilot:
                 self.stats.jobs_processed += 1
                 self.stats.jobs_ready += 1
                 
-                logger.info(f"✓ Resume ready: {compile_result['pdf_path']}")
+                logger.info(f"[OK] Resume ready: {compile_result['pdf_path']}")
                 
             except Exception as e:
                 logger.error(f"Error processing {job.job_id}: {e}", exc_info=True)

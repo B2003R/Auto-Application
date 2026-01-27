@@ -1,122 +1,151 @@
-% Minimal LaTeX Resume Template for Job Application Co-Pilot
-% This template is designed to work with the automated tailoring system
+%-------------------------
+% ATS-Optimized Resume Template for New Grads
+% Based on sb2nov/resume template (Most ATS-friendly)
+% Single-column, no graphics, machine-readable
+%-------------------------
 
-\documentclass[11pt,letterpaper]{article}
+\documentclass[letterpaper,11pt]{article}
 
-% Packages
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[margin=0.75in]{geometry}
-\usepackage{hyperref}
-\usepackage{enumitem}
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
 \usepackage{titlesec}
-\usepackage{xcolor}
-\usepackage{fontawesome5}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
 
-% Colors
-\definecolor{headercolor}{RGB}{0, 51, 102}
-\definecolor{linkcolor}{RGB}{0, 102, 204}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
 
-% Hyperlink setup
-\hypersetup{
-    colorlinks=true,
-    linkcolor=linkcolor,
-    urlcolor=linkcolor
-}
+% Adjust margins for single page
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-0.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
 
 % Section formatting
-\titleformat{\section}
-    {\large\bfseries\color{headercolor}}
-    {}
-    {0em}
-    {}
-    [\titlerule]
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
 
-\titlespacing{\section}{0pt}{12pt}{6pt}
+% Ensure PDF is machine readable/ATS parsable
+\pdfgentounicode=1
 
-% List formatting
-\setlist[itemize]{noitemsep, topsep=2pt, leftmargin=*}
-
-% Remove page numbers
-\pagestyle{empty}
-
+%-------------------------
 % Custom commands
-\newcommand{\role}[4]{
-    \textbf{#1} \hfill #2 \\
-    \textit{#3} \hfill \textit{#4}
+\newcommand{\resumeItem}[1]{
+  \item\small{#1 \vspace{-2pt}}
 }
 
-\newcommand{\project}[2]{
-    \textbf{#1} -- #2
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
 }
 
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
 \begin{document}
 
-% =============================================================================
-% HEADER
-% =============================================================================
+%----------HEADING----------
 \begin{center}
-    {\LARGE\textbf{FIRST LAST}} \\[4pt]
-    \faIcon{map-marker-alt} City, State \quad
-    \faIcon{envelope} \href{mailto:email@example.com}{email@example.com} \quad
-    \faIcon{phone} (555) 123-4567 \\[2pt]
-    \faIcon{linkedin} \href{https://linkedin.com/in/username}{linkedin.com/in/username} \quad
-    \faIcon{github} \href{https://github.com/username}{github.com/username}
+    \textbf{\Huge \scshape FIRST LAST} \\ \vspace{1pt}
+    \small (555) 123-4567 $|$ \href{mailto:email@example.com}{\underline{email@example.com}} $|$ 
+    \href{https://linkedin.com/in/username}{\underline{linkedin.com/in/username}} $|$
+    \href{https://github.com/username}{\underline{github.com/username}}
 \end{center}
 
-% =============================================================================
-% PROFESSIONAL SUMMARY
-% =============================================================================
-\section{Professional Summary}
-Senior Software Engineer with X+ years of experience in [relevant skills].
-Expertise in [key technologies]. Proven track record of [key achievements].
-
-% =============================================================================
-% TECHNICAL SKILLS
-% =============================================================================
-\section{Technical Skills}
-\begin{itemize}
-    \item \textbf{Languages:} Python, JavaScript, Go, SQL
-    \item \textbf{Frameworks:} FastAPI, Django, React, Node.js
-    \item \textbf{Cloud/DevOps:} AWS, GCP, Docker, Kubernetes
-    \item \textbf{Databases:} PostgreSQL, MongoDB, Redis
-\end{itemize}
-
-% =============================================================================
-% PROFESSIONAL EXPERIENCE
-% =============================================================================
-\section{Professional Experience}
-
-\role{Senior Software Engineer}{2021 -- Present}{Company Name}{City, State}
-\begin{itemize}
-    \item Achieved [quantified result] by [action taken]
-    \item Designed and implemented [system/feature] resulting in [impact]
-    \item Led [initiative] improving [metric] by [percentage]
-\end{itemize}
-
-\vspace{6pt}
-
-\role{Software Engineer}{2019 -- 2021}{Company Name}{City, State}
-\begin{itemize}
-    \item Built [feature/system] that [impact]
-    \item Optimized [process] resulting in [quantified improvement]
-    \item Collaborated with [teams] to deliver [outcome]
-\end{itemize}
-
-% =============================================================================
-% EDUCATION
-% =============================================================================
+%-----------EDUCATION-----------
 \section{Education}
-\textbf{Bachelor of Science in Computer Science} \hfill 2018 \\
-University Name \hfill GPA: 3.X/4.0
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {University Name}{City, State}
+      {Bachelor of Science in Computer Science; GPA: 3.XX}{Aug 20XX -- May 20XX}
+      \resumeItemListStart
+        \resumeItem{\textbf{Relevant Coursework:} Data Structures, Algorithms, Machine Learning, Database Systems}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
 
-% =============================================================================
-% CERTIFICATIONS (Optional)
-% =============================================================================
-\section{Certifications \& Achievements}
-\begin{itemize}
-    \item AWS Solutions Architect Associate (Year)
-    \item Certification or Achievement
-\end{itemize}
+%-----------TECHNICAL SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{: Python, Java, JavaScript, SQL, C++} \\
+     \textbf{Frameworks}{: React, Node.js, Django, Flask, FastAPI} \\
+     \textbf{Developer Tools}{: Git, Docker, AWS, VS Code, Linux} \\
+     \textbf{Libraries}{: pandas, NumPy, scikit-learn, TensorFlow, PyTorch}
+    }}
+ \end{itemize}
 
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Software Engineering Intern}{May 20XX -- Aug 20XX}
+      {Company Name}{City, State}
+      \resumeItemListStart
+        \resumeItem{Developed feature X using Y technology, resulting in Z\% improvement}
+        \resumeItem{Collaborated with team of N engineers to deliver project on time}
+        \resumeItem{Implemented automated testing reducing bug reports by X\%}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+      \resumeProjectHeading
+          {\textbf{Project Name} $|$ \emph{Python, React, PostgreSQL}}{Month 20XX}
+          \resumeItemListStart
+            \resumeItem{Built a full-stack web application that does X for Y users}
+            \resumeItem{Implemented feature Z using technology A, improving performance by B\%}
+          \resumeItemListEnd
+      \resumeProjectHeading
+          {\textbf{Another Project} $|$ \emph{Java, Spring Boot, AWS}}{Month 20XX}
+          \resumeItemListStart
+            \resumeItem{Designed and deployed microservice architecture handling X requests/day}
+            \resumeItem{Reduced latency by Y\% through caching and query optimization}
+          \resumeItemListEnd
+    \resumeSubHeadingListEnd
+
+%-----------LEADERSHIP & ACTIVITIES (Optional)-----------
+% \section{Leadership \& Activities}
+%     \resumeSubHeadingListStart
+%       \resumeSubheading
+%           {Club/Organization Name}{Month 20XX -- Present}
+%           {Position/Role}{University}
+%           \resumeItemListStart
+%             \resumeItem{Led team of X members to achieve Y}
+%           \resumeItemListEnd
+%     \resumeSubHeadingListEnd
+
+%-------------------------------------------
 \end{document}

@@ -399,8 +399,8 @@ class BrightDataJobScraper:
         job_type: Optional[str] = None,
         experience_level: Optional[str] = None,
         remote: Optional[str] = None,
-        poll_interval: int = 30,
-        max_wait: int = 1200
+        poll_interval: int = 60,
+        max_wait: int = 7200
     ) -> List[Job]:
         """
         Execute the full scraping workflow.
